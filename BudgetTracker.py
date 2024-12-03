@@ -2,13 +2,21 @@ import json
 import os
 from datetime import datetime
 
-# File to store budget data
+# Default file to store budget data
 data_file = 'budget_data.json'
 
-# Check if the data file exists, if not create it
-if not os.path.exists(data_file):
+# Function to create or reset the data file
+def initialize_data_file(new_file=None):
+    global data_file
+    if new_file:
+        data_file = new_file
+    
     with open(data_file, 'w') as file:
         json.dump({}, file)
+
+# Check if the data file exists, if not, create it
+if not os.path.exists(data_file):
+    initialize_data_file()
 
 # Load existing data from the file
 def load_data():
@@ -67,23 +75,24 @@ def display_menu():
     print("1. Add Income")
     print("2. Add Expense")
     print("3. View Monthly Summary")
-    print("4. Exit")
-    
+    print("4. Reset Data File")
+    print("5. Exit")
+
 def main():
     data = load_data()
     
     while True:
         display_menu()
-        choice = input("Choose an option (1-4): ")
+        choice = input("Choose an option (1-5): ")
 
         if choice == '1':
-            amount = float(input("Enter income amount: $"))
+            amount = float(input("Enter income amount: €"))
             description = input("Enter description: ")
             add_entry(data, 'income', amount, 'General', description)
             print("Income added successfully.\n")
         
         elif choice == '2':
-            amount = float(input("Enter expense amount: $"))
+            amount = float(input("Enter expense amount: €"))
             category = input("Enter expense category (e.g., Food, Transport, etc.): ")
             description = input("Enter description: ")
             add_entry(data, 'expense', amount, category, description)
@@ -93,6 +102,23 @@ def main():
             view_summary(data)
         
         elif choice == '4':
+            print("1. Reset the current file")
+            print("2. Create a new file")
+            reset_choice = input("Choose an option (1-2): ")
+
+            if reset_choice == '1':
+                initialize_data_file()
+                data = load_data()
+                print("Data file reset successfully.\n")
+            elif reset_choice == '2':
+                new_file = input("Enter the name of the new file (e.g., new_budget_data.json): ")
+                initialize_data_file(new_file)
+                data = load_data()
+                print(f"New data file '{new_file}' created and initialized.\n")
+            else:
+                print("Invalid choice. Returning to the main menu.\n")
+        
+        elif choice == '5':
             print("Exiting the Personal Budget Tracker. Goodbye!")
             break
         
